@@ -41,24 +41,14 @@ WriteTimeout = 40
 # http server idle timeout, unit: s
 IdleTimeout = 120
 
-[HTTP.Pushgw]
+[HTTP.APIForAgent]
 Enable = true 
-# [HTTP.Pushgw.BasicAuth]
+# [HTTP.APIForAgent.BasicAuth]
 # user001 = "ccc26da7b9aba533cbb263a36c07dcc5"
 
-[HTTP.Alert]
+[HTTP.APIForService]
 Enable = true 
-[HTTP.Alert.BasicAuth]
-user001 = "ccc26da7b9aba533cbb263a36c07dcc5"
-
-[HTTP.Heartbeat]
-Enable = true 
-# [HTTP.Heartbeat.BasicAuth]
-# user001 = "ccc26da7b9aba533cbb263a36c07dcc5"
-
-[HTTP.Service]
-Enable = true 
-[HTTP.Service.BasicAuth]
+[HTTP.APIForService.BasicAuth]
 user001 = "ccc26da7b9aba533cbb263a36c07dcc5"
 
 [HTTP.JWTAuth]
@@ -79,7 +69,7 @@ DefaultRoles = ["Standard"]
 
 [DB]
 # postgres: host=%s port=%s user=%s dbname=%s password=%s sslmode=%s
-DSN="root:macroview@tcp(127.0.0.1:3307)/n9e_v6?charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
+DSN="root:1234@tcp(127.0.0.1:3306)/n9e_v6?charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
 # enable debug mode or not
 Debug = false
 # mysql postgres
@@ -97,9 +87,9 @@ TablePrefix = ""
 
 [Redis]
 # address, ip:port or ip1:port,ip2:port for cluster and sentinel(SentinelAddrs)
-Address = "192.168.100.121:6379"
+Address = "127.0.0.1:6379"
 # Username = ""
-Password = "admin@123"
+# Password = ""
 # DB = 0
 # UseTLS = false
 # TLSMinVersion = "1.2"
