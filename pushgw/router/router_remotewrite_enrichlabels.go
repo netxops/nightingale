@@ -37,6 +37,7 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 }
 
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
+	fmt.Println("======开始执行remakeWriteRemoteEnrichLabels=======")
 	for _, v := range REDIS_TAGS {
 		ident := ""
 		for i := 0; i < len(pt.Labels); i++ {
@@ -48,6 +49,7 @@ func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 		if ident == "" {
 			break
 		}
+		fmt.Println("当前ident值为：", ident)
 		//实际匹配到ident
 		if strings.Contains(ident, v.IP) {
 			target, exist := rt.TargetCache.Get(ident)
@@ -55,14 +57,17 @@ func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 				logger.Errorf(fmt.Sprintf("not found target[%s] device[%s]", ident, v.DeviceName))
 				return
 			}
+			fmt.Println("匹配到相应ident：", ident)
 			for _, tag := range v.Tags {
 				target.TagsMap[tag.Dimension] = tag.TagName
 			}
+			fmt.Println("当前ident的扩展标签为：", target.TagsMap)
 		}
 	}
 }
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
+	fmt.Println("======开始执行EnrichLabelsFromRedis=====")
 	ct := rt.Ctx
 	rds := rt.TargetCache.GetRedis()
 	labelMap, err := rds.HGetAll(ct.GetContext(), DEVICE_TAG_REDIS_KEY).Result()
@@ -71,6 +76,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 		return nil
 	}
 
+	fmt.Println("获取redis数据：", labelMap)
 	if len(labelMap) == 0 {
 		return nil
 	}
@@ -112,5 +118,6 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 		result[dtp.IP] = dtp
 	}
 
+	fmt.Println("输出map DeviceTagPair： ", result)
 	return result
 }
