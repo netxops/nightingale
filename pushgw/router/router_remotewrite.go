@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -108,6 +109,7 @@ func (rt *Router) remoteWrite(c *gin.Context) {
 			ids[ident] = struct{}{}
 		}
 
+		fmt.Println("=====开始从remotewrite方法中调用EnrichLabels=====")
 		rt.EnrichLabels(req.Timeseries[i])
 		rt.debugSample(c.Request.RemoteAddr, req.Timeseries[i])
 
