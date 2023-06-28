@@ -43,6 +43,10 @@ func NewTargetCache(ctx *ctx.Context, stats *Stats, redis storage.Redis) *Target
 	return tc
 }
 
+func (tc *TargetCacheType) GetRedis() storage.Redis {
+	return tc.redis
+}
+
 func (tc *TargetCacheType) Reset() {
 	tc.Lock()
 	defer tc.Unlock()

@@ -3,6 +3,7 @@ package center
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ccfos/nightingale/v6/alert"
 	"github.com/ccfos/nightingale/v6/alert/astats"
@@ -80,6 +81,7 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 	alertrtRouter := alertrt.New(config.HTTP, config.Alert, alertMuteCache, targetCache, busiGroupCache, alertStats, ctx, externalProcessors)
 	centerRouter := centerrt.New(config.HTTP, config.Center, cconf.Operations, dsCache, notifyConfigCache, promClients, redis, sso, ctx, metas, targetCache)
 	pushgwRouter := pushgwrt.New(config.HTTP, config.Pushgw, targetCache, busiGroupCache, idents, writers, ctx)
+	loopTagTask(*pushgwRouter)
 
 	r := httpx.GinEngine(config.Global.RunMode, config.HTTP)
 
@@ -93,4 +95,17 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 		logxClean()
 		httpClean()
 	}, nil
+}
+
+func loopTagTask(pushgwRouter pushgwrt.Router) {
+	task := func() {
+		for {
+			duration, _ := time.ParseDuration("30s")
+			time.Sleep(duration)
+			richLabels := pushgwRouter.EnrichLabelsFromRedis()
+			pushgwrt.REDIS_TAGS = richLabels
+		}
+	}
+
+	go task()
 }

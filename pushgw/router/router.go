@@ -26,7 +26,7 @@ type Router struct {
 }
 
 func New(httpConfig httpx.Config, pushgw pconf.Pushgw, tc *memsto.TargetCacheType, bg *memsto.BusiGroupCacheType, idents *idents.Set, writers *writer.WritersType, ctx *ctx.Context) *Router {
-	return &Router{
+	r := Router{
 		HTTP:           httpConfig,
 		Pushgw:         pushgw,
 		Writers:        writers,
@@ -34,8 +34,13 @@ func New(httpConfig httpx.Config, pushgw pconf.Pushgw, tc *memsto.TargetCacheTyp
 		TargetCache:    tc,
 		BusiGroupCache: bg,
 		IdentSet:       idents,
-		EnrichLabels:   func(pt *prompb.TimeSeries) {},
+		//原代码默认为空方法
+		//EnrichLabels:   func(pt *prompb.TimeSeries) {},
 	}
+
+	r.EnrichLabels = r.remakeWriteRemoteEnrichLabels
+	REDIS_TAGS = r.EnrichLabelsFromRedis()
+	return &r
 }
 
 func (rt *Router) Config(r *gin.Engine) {
