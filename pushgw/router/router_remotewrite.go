@@ -79,8 +79,6 @@ func (rt *Router) remoteWrite(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(fmt.Sprintf("请求的req.Timeseries为：%#v", req.Timeseries))
-
 	var (
 		ident  string
 		metric string
@@ -88,9 +86,12 @@ func (rt *Router) remoteWrite(c *gin.Context) {
 	)
 
 	for i := 0; i < count; i++ {
+
 		if duplicateLabelKey(req.Timeseries[i]) {
 			continue
 		}
+
+		fmt.Println(fmt.Sprintf("请求的req.Timeseries[%d]为： %s", i, req.Timeseries[i].String()))
 
 		ident = extractIdentFromTimeSeries(req.Timeseries[i])
 		if len(ident) > 0 {
