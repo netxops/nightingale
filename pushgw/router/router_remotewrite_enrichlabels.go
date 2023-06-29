@@ -39,6 +39,7 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 	fmt.Println("======开始执行remakeWriteRemoteEnrichLabels=======")
+	fmt.Println(fmt.Sprintf("全局变量REDIS_TAGS：%#v", REDIS_TAGS))
 	for _, v := range REDIS_TAGS {
 		ident := ""
 		for i := 0; i < len(pt.Labels); i++ {
@@ -53,6 +54,7 @@ func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 		fmt.Println("当前ident值为：", ident)
 		//实际匹配到ident
 		if strings.Contains(ident, v.IP) {
+			fmt.Println(fmt.Sprintf("TargetCache数据为：%#v", rt.TargetCache))
 			target, exist := rt.TargetCache.Get(ident)
 			fmt.Println(fmt.Sprintf("target数据为：%#v， 是否存在：%s", target, strconv.FormatBool(exist)))
 			if !exist {
