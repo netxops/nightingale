@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"strconv"
+
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/toolkits/pkg/logger"
 )
@@ -54,13 +56,14 @@ func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 		//实际匹配到ident
 		if strings.Contains(ident, v.IP) {
 			target, exist := rt.TargetCache.Get(ident)
+			fmt.Println(fmt.Sprintf("target数据为：%#v， 是否存在：%s", target, strconv.FormatBool(exist)))
 			if !exist {
 				logger.Errorf(fmt.Sprintf("not found target[%s] device[%s]", ident, v.DeviceName))
 				return
 			}
 			fmt.Println("匹配到相应ident：", ident)
 			for _, tag := range v.Tags {
-				target.TagsMap[tag.Dimension] = tag.TagName
+				target.TagsMap[tag.TagLabel] = tag.TagName
 			}
 			fmt.Println("当前ident的扩展标签为：", target.TagsMap)
 		}
@@ -68,7 +71,6 @@ func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 }
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
-	fmt.Println("======开始执行EnrichLabelsFromRedis=====")
 	ct := rt.Ctx
 	rds := rt.TargetCache.GetRedis()
 	labelMap, err := rds.HGetAll(ct.GetContext(), DEVICE_TAG_REDIS_KEY).Result()
@@ -119,6 +121,5 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 		result[dtp.IP] = dtp
 	}
 
-	fmt.Println("输出map DeviceTagPair： ", result)
 	return result
 }
