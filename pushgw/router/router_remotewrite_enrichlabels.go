@@ -20,13 +20,13 @@ var REDIS_TAGS map[string]DeviceTagPair
 type SpecifyLabel string
 
 type DeviceTagPair struct {
-	ResourceKey string      `json:"resource_key"`
-	ResourceId  string      `json:"resource_id"`
-	DeviceName  string      `json:"device_name"`
-	IPV4        string      `json:"ipv4"`
-	IPV6        string      `json:"ipv6"`
-	IP          string      `json:"ip"`
-	Tags        []DeviceTag `json:"tags"`
+	ResourceKey string       `json:"resource_key"`
+	ResourceId  string       `json:"resource_id"`
+	DeviceName  string       `json:"device_name"`
+	IPV4        string       `json:"ipv4"`
+	IPV6        string       `json:"ipv6"`
+	IP          string       `json:"ip"`
+	Tags        []*DeviceTag `json:"tags"`
 }
 
 type DeviceTag struct {
