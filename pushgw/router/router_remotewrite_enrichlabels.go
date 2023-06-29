@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/prometheus/prometheus/prompb"
@@ -11,8 +10,14 @@ import (
 )
 
 const DEVICE_TAG_REDIS_KEY = "DEVICE_TAG_REDIS_KEY"
+const (
+	IDENT  SpecifyLabel = "ident"
+	TARGET SpecifyLabel = "target"
+)
 
 var REDIS_TAGS map[string]DeviceTagPair
+
+type SpecifyLabel string
 
 type DeviceTagPair struct {
 	ResourceKey string      `json:"resource_key"`
@@ -39,36 +44,46 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 }
 
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
-	fmt.Println("======开始执行remakeWriteRemoteEnrichLabels=======")
-	fmt.Println(fmt.Sprintf("全局变量REDIS_TAGS：%#v", REDIS_TAGS))
-	for _, v := range REDIS_TAGS {
-		ident := ""
-		for i := 0; i < len(pt.Labels); i++ {
-			if pt.Labels[i].Name == "ident" {
-				ident = pt.Labels[i].Value
-				break
-			}
-		}
-		if ident == "" {
-			break
-		}
-		fmt.Println("当前ident值为：", ident)
-		//实际匹配到ident
-		if strings.Contains(ident, v.IP) {
-			fmt.Println(fmt.Sprintf("TargetCache数据为：%#v", rt.TargetCache))
-			target, exist := rt.TargetCache.Get(ident)
-			fmt.Println(fmt.Sprintf("target数据为：%#v， 是否存在：%s", target, strconv.FormatBool(exist)))
-			if !exist {
-				logger.Errorf(fmt.Sprintf("not found target[%s] device[%s]", ident, v.DeviceName))
-				return
-			}
-			fmt.Println("匹配到相应ident：", ident)
-			for _, tag := range v.Tags {
-				target.TagsMap[tag.TagLabel] = tag.TagName
-			}
-			fmt.Println("当前ident的扩展标签为：", target.TagsMap)
-		}
+	identVal, identExist := has(string(IDENT), pt)
+	if identExist {
+		richTimeSeries(string(IDENT), identVal, pt)
+		return
 	}
+	targetVal, targetExist := has(string(TARGET), pt)
+	if targetExist {
+		richTimeSeries(string(TARGET), targetVal, pt)
+		return
+	}
+	//fmt.Println("======开始执行remakeWriteRemoteEnrichLabels=======")
+	//fmt.Println(fmt.Sprintf("全局变量REDIS_TAGS：%#v", REDIS_TAGS))
+	//for _, v := range REDIS_TAGS {
+	//	ident := ""
+	//	for i := 0; i < len(pt.Labels); i++ {
+	//		if pt.Labels[i].Name == "ident" {
+	//			ident = pt.Labels[i].Value
+	//			break
+	//		}
+	//	}
+	//	if ident == "" {
+	//		break
+	//	}
+	//	fmt.Println("当前ident值为：", ident)
+	//	//实际匹配到ident
+	//	if strings.Contains(ident, v.IP) {
+	//		fmt.Println(fmt.Sprintf("TargetCache数据为：%#v", rt.TargetCache))
+	//		target, exist := rt.TargetCache.Get(ident)
+	//		fmt.Println(fmt.Sprintf("target数据为：%#v， 是否存在：%s", target, strconv.FormatBool(exist)))
+	//		if !exist {
+	//			logger.Errorf(fmt.Sprintf("not found target[%s] device[%s]", ident, v.DeviceName))
+	//			return
+	//		}
+	//		fmt.Println("匹配到相应ident：", ident)
+	//		for _, tag := range v.Tags {
+	//			target.TagsMap[tag.TagLabel] = tag.TagName
+	//		}
+	//		fmt.Println("当前ident的扩展标签为：", target.TagsMap)
+	//	}
+	//}
 }
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
@@ -125,25 +140,36 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 	return result
 }
 
-func matchIdent(pt *prompb.TimeSeries) {
-	//for _, v := range REDIS_TAGS {
-	//	ident := ""
-	//	for i := 0; i < len(pt.Labels); i++ {
-	//		if pt.Labels[i].Name == "ident" {
-	//			ident = pt.Labels[i].Value
-	//			break
-	//		}
-	//	}
-	//	if ident == "" {
-	//		break
-	//	}
-	//
-	//	if strings.Contains(ident, v.IP) {
-	//
-	//	}
-	//}
+func has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
+	for _, v := range pt.Labels {
+		if strings.Contains(v.Name, key) {
+			return v.Value, true
+		}
+	}
+	return "", false
 }
 
-func matchTarget(pt *prompb.TimeSeries) {
+func richTimeSeries(key string, keyValue string, pt *prompb.TimeSeries) {
+	matched := false
+	dtp := DeviceTagPair{}
+	for _, v := range REDIS_TAGS {
+		if strings.Contains(keyValue, v.IP) {
+			matched = true
+			dtp = v
+			break
+		}
+	}
 
+	if matched {
+		switch key {
+		case string(IDENT):
+			for _, dt := range dtp.Tags {
+				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
+				pt.Labels = append(pt.Labels, &label)
+			}
+		case string(TARGET):
+			label := prompb.Label{Name: "toDevice", Value: dtp.IP}
+			pt.Labels = append(pt.Labels, &label)
+		}
+	}
 }
