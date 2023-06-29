@@ -172,4 +172,6 @@ func richTimeSeries(key string, keyValue string, pt *prompb.TimeSeries) {
 			pt.Labels = append(pt.Labels, &label)
 		}
 	}
+
+	fmt.Println(fmt.Sprintf("新的时序数据：%#v", pt.String()))
 }
