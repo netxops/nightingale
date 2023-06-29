@@ -11,8 +11,9 @@ import (
 
 const DEVICE_TAG_REDIS_KEY = "DEVICE_TAG_REDIS_KEY"
 const (
-	IDENT  SpecifyLabel = "ident"
-	TARGET SpecifyLabel = "target"
+	IDENT    SpecifyLabel = "ident"
+	TARGET   SpecifyLabel = "target"
+	IF_DESCR SpecifyLabel = "ifDescr"
 )
 
 var REDIS_TAGS map[string]DeviceTagPair
@@ -46,44 +47,18 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 	identVal, identExist := has(string(IDENT), pt)
 	if identExist {
-		richTimeSeries(string(IDENT), identVal, pt)
-		return
+		richTimeSeriesForMatchedIdent(identVal, pt)
 	}
+
 	targetVal, targetExist := has(string(TARGET), pt)
 	if targetExist {
-		richTimeSeries(string(TARGET), targetVal, pt)
-		return
+		richTimeSeriesForMatchedTarget(targetVal, pt)
 	}
-	//fmt.Println("======开始执行remakeWriteRemoteEnrichLabels=======")
-	//fmt.Println(fmt.Sprintf("全局变量REDIS_TAGS：%#v", REDIS_TAGS))
-	//for _, v := range REDIS_TAGS {
-	//	ident := ""
-	//	for i := 0; i < len(pt.Labels); i++ {
-	//		if pt.Labels[i].Name == "ident" {
-	//			ident = pt.Labels[i].Value
-	//			break
-	//		}
-	//	}
-	//	if ident == "" {
-	//		break
-	//	}
-	//	fmt.Println("当前ident值为：", ident)
-	//	//实际匹配到ident
-	//	if strings.Contains(ident, v.IP) {
-	//		fmt.Println(fmt.Sprintf("TargetCache数据为：%#v", rt.TargetCache))
-	//		target, exist := rt.TargetCache.Get(ident)
-	//		fmt.Println(fmt.Sprintf("target数据为：%#v， 是否存在：%s", target, strconv.FormatBool(exist)))
-	//		if !exist {
-	//			logger.Errorf(fmt.Sprintf("not found target[%s] device[%s]", ident, v.DeviceName))
-	//			return
-	//		}
-	//		fmt.Println("匹配到相应ident：", ident)
-	//		for _, tag := range v.Tags {
-	//			target.TagsMap[tag.TagLabel] = tag.TagName
-	//		}
-	//		fmt.Println("当前ident的扩展标签为：", target.TagsMap)
-	//	}
-	//}
+
+	ifDescrVal, ifDescrExist := has(string(IF_DESCR), pt)
+	if ifDescrExist {
+		richTimeSeriesForMatchedIfDescr(ifDescrVal, pt)
+	}
 }
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
@@ -149,7 +124,7 @@ func has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
 	return "", false
 }
 
-func richTimeSeries(key string, keyValue string, pt *prompb.TimeSeries) {
+func richTimeSeriesForMatchedIdent(keyValue string, pt *prompb.TimeSeries) {
 	matched := false
 	dtp := DeviceTagPair{}
 	for _, v := range REDIS_TAGS {
@@ -161,17 +136,38 @@ func richTimeSeries(key string, keyValue string, pt *prompb.TimeSeries) {
 	}
 
 	if matched {
-		switch key {
-		case string(IDENT):
-			for _, dt := range dtp.Tags {
-				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
-				pt.Labels = append(pt.Labels, &label)
-			}
-		case string(TARGET):
-			label := prompb.Label{Name: "toDevice", Value: dtp.IP}
+		for _, dt := range dtp.Tags {
+			label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
 			pt.Labels = append(pt.Labels, &label)
 		}
 	}
+}
 
-	fmt.Println(fmt.Sprintf("新的时序数据：%#v", pt.String()))
+func richTimeSeriesForMatchedTarget(keyValue string, pt *prompb.TimeSeries) {
+	matched := false
+	dtp := DeviceTagPair{}
+	for _, v := range REDIS_TAGS {
+		if strings.Contains(keyValue, v.IP) {
+			matched = true
+			dtp = v
+			break
+		}
+	}
+
+	if matched {
+		label := prompb.Label{Name: "toDevice", Value: dtp.IP}
+		pt.Labels = append(pt.Labels, &label)
+	}
+}
+
+func richTimeSeriesForMatchedIfDescr(keyValue string, pt *prompb.TimeSeries) {
+	if keyValue == "100GE0/0/1" {
+		label := prompb.Label{Name: "xxx", Value: "value_xxx"}
+		pt.Labels = append(pt.Labels, &label)
+	}
+
+	if keyValue == "100GE0/0/2" {
+		label := prompb.Label{Name: "yyy", Value: "value_yyy"}
+		pt.Labels = append(pt.Labels, &label)
+	}
 }
