@@ -3,9 +3,10 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/toolkits/pkg/logger"
-	"strings"
 )
 
 const DEVICE_TAG_REDIS_KEY = "DEVICE_TAG_REDIS_KEY"
@@ -72,7 +73,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 	rds := rt.TargetCache.GetRedis()
 	labelMap, err := rds.HGetAll(ct.GetContext(), DEVICE_TAG_REDIS_KEY).Result()
 	if err != nil {
-		logger.Errorf("get enrichLabels from redis has error", err)
+		logger.Errorf("get enrichLabels from redis has error: %v", err)
 		return nil
 	}
 
@@ -85,7 +86,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 	for _, v := range labelMap {
 		dtp := DeviceTagPair{}
 		if err = json.Unmarshal([]byte(v), &dtp); err != nil {
-			logger.Errorf("parse DeviceTagPair error:", err)
+			logger.Errorf("parse DeviceTagPair error: %v", err)
 			return nil
 		}
 		if dtp.IPV4 != "" && dtp.IPV6 != "" {
