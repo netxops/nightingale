@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -91,7 +90,7 @@ func (rt *Router) remoteWrite(c *gin.Context) {
 			continue
 		}
 
-		fmt.Println(fmt.Sprintf("请求的req.Timeseries[%d]为： %s", i, req.Timeseries[i].String()))
+		//fmt.Println(fmt.Sprintf("请求的req.Timeseries[%d]为： %s", i, req.Timeseries[i].String()))
 
 		ident = extractIdentFromTimeSeries(req.Timeseries[i])
 		if len(ident) > 0 {
