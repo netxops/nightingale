@@ -35,11 +35,11 @@ func New(httpConfig httpx.Config, pushgw pconf.Pushgw, tc *memsto.TargetCacheTyp
 		BusiGroupCache: bg,
 		IdentSet:       idents,
 		//原代码默认为空方法
-		//EnrichLabels:   func(pt *prompb.TimeSeries) {},
+		EnrichLabels: func(pt *prompb.TimeSeries) {},
 	}
 
-	r.EnrichLabels = r.remakeWriteRemoteEnrichLabels
-	REDIS_TAGS = r.EnrichLabelsFromRedis()
+	//r.EnrichLabels = r.remakeWriteRemoteEnrichLabels
+	//REDIS_TAGS = r.EnrichLabelsFromRedis()
 	return &r
 }
 

@@ -3,9 +3,8 @@ package router
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
-
 	"strconv"
+	"strings"
 
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/toolkits/pkg/logger"
@@ -124,4 +123,27 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 	}
 
 	return result
+}
+
+func matchIdent(pt *prompb.TimeSeries) {
+	//for _, v := range REDIS_TAGS {
+	//	ident := ""
+	//	for i := 0; i < len(pt.Labels); i++ {
+	//		if pt.Labels[i].Name == "ident" {
+	//			ident = pt.Labels[i].Value
+	//			break
+	//		}
+	//	}
+	//	if ident == "" {
+	//		break
+	//	}
+	//
+	//	if strings.Contains(ident, v.IP) {
+	//
+	//	}
+	//}
+}
+
+func matchTarget(pt *prompb.TimeSeries) {
+
 }

@@ -79,6 +79,8 @@ func (rt *Router) remoteWrite(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(fmt.Sprintf("请求的req.Timeseries为：%#v", req.Timeseries))
+
 	var (
 		ident  string
 		metric string
@@ -109,7 +111,6 @@ func (rt *Router) remoteWrite(c *gin.Context) {
 			ids[ident] = struct{}{}
 		}
 
-		fmt.Println("=====开始从remotewrite方法中调用EnrichLabels=====")
 		rt.EnrichLabels(req.Timeseries[i])
 		rt.debugSample(c.Request.RemoteAddr, req.Timeseries[i])
 
