@@ -81,13 +81,17 @@ func Initialize(configDir string, cryptoKey string) (func(), error) {
 	alertrtRouter := alertrt.New(config.HTTP, config.Alert, alertMuteCache, targetCache, busiGroupCache, alertStats, ctx, externalProcessors)
 	centerRouter := centerrt.New(config.HTTP, config.Center, cconf.Operations, dsCache, notifyConfigCache, promClients, redis, sso, ctx, metas, targetCache)
 	pushgwRouter := pushgwrt.New(config.HTTP, config.Pushgw, targetCache, busiGroupCache, idents, writers, ctx)
+	fmt.Println("00000000000000000000000")
 	loopTagTask(*pushgwRouter)
+
+	fmt.Println("11111111111111111111")
 
 	r := httpx.GinEngine(config.Global.RunMode, config.HTTP)
 
 	centerRouter.Config(r)
 	alertrtRouter.Config(r)
 	pushgwRouter.Config(r)
+	fmt.Println("22222222222222222222222")
 
 	httpClean := httpx.Init(config.HTTP, r)
 
