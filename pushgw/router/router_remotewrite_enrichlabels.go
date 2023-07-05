@@ -46,7 +46,7 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 	if identVal, identExist := has(string(IDENT), pt); identExist {
-		richTimeSeriesForMatchedIdent(identVal, pt)
+		richTimeSeriesForMatchedIdent(identVal+"/24", pt)
 	}
 
 	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
@@ -84,7 +84,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 			continue
 		}
 		if dtp.IPV4 != "" {
-			dtp.IP = dtp.IPV4 + "/24"
+			dtp.IP = dtp.IPV4
 		}
 		if dtp.IPV6 != "" {
 			dtp.IP = dtp.IPV6
