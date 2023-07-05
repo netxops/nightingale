@@ -45,18 +45,15 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 }
 
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
-	identVal, identExist := has(string(IDENT), pt)
-	if identExist {
+	if identVal, identExist := has(string(IDENT), pt); identExist {
 		richTimeSeriesForMatchedIdent(identVal, pt)
 	}
 
-	targetVal, targetExist := has(string(TARGET), pt)
-	if targetExist {
+	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
 		richTimeSeriesForMatchedTarget(targetVal, pt)
 	}
 
-	ifDescrVal, ifDescrExist := has(string(IF_DESCR), pt)
-	if ifDescrExist {
+	if ifDescrVal, ifDescrExist := has(string(IF_DESCR), pt); ifDescrExist {
 		richTimeSeriesForMatchedIfDescr(ifDescrVal, pt)
 	}
 }
@@ -70,7 +67,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 		return nil
 	}
 
-	fmt.Println("获取redis数据：", labelMap)
+	logger.Info("获取redis数据，数据长度：", len(labelMap))
 	if len(labelMap) == 0 {
 		return nil
 	}
@@ -80,17 +77,21 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 		dtp := DeviceTagPair{}
 		if err = json.Unmarshal([]byte(v), &dtp); err != nil {
 			logger.Errorf("parse DeviceTagPair error: %v", err)
-			return nil
+			continue
 		}
 		if dtp.IPV4 != "" && dtp.IPV6 != "" {
-			logger.Errorf(fmt.Sprintf("parse DeviceTagPair error: %s has mutil ip address", dtp.DeviceName))
-			return nil
+			logger.Warning(fmt.Sprintf("parse DeviceTagPair error: %s has mutil ip address", dtp.DeviceName))
+			continue
 		}
 		if dtp.IPV4 != "" {
 			dtp.IP = dtp.IPV4
 		}
 		if dtp.IPV6 != "" {
 			dtp.IP = dtp.IPV6
+		}
+		if dtp.IP == "" {
+			logger.Warning(fmt.Sprintf("%s has not ip address", dtp.DeviceName))
+			continue
 		}
 
 		for _, tag := range dtp.Tags {
@@ -107,6 +108,8 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 				tag.TagLabel = "productLine"
 			case "云平台":
 				tag.TagLabel = "cloudPlatform"
+			default:
+				break
 			}
 		}
 		result[dtp.IP] = dtp
