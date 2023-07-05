@@ -49,13 +49,13 @@ func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 		richTimeSeriesForMatchedIdent(identVal+"/24", pt)
 	}
 
-	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
-		richTimeSeriesForMatchedTarget(targetVal, pt)
-	}
-
-	if ifDescrVal, ifDescrExist := has(string(IF_DESCR), pt); ifDescrExist {
-		richTimeSeriesForMatchedIfDescr(ifDescrVal, pt)
-	}
+	//if targetVal, targetExist := has(string(TARGET), pt); targetExist {
+	//	richTimeSeriesForMatchedTarget(targetVal, pt)
+	//}
+	//
+	//if ifDescrVal, ifDescrExist := has(string(IF_DESCR), pt); ifDescrExist {
+	//	richTimeSeriesForMatchedIfDescr(ifDescrVal, pt)
+	//}
 }
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
@@ -108,6 +108,8 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 				tag.TagLabel = "productLine"
 			case "云平台":
 				tag.TagLabel = "cloudPlatform"
+			case "toDevice":
+				tag.TagLabel = "toDevice"
 			default:
 				break
 			}
