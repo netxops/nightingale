@@ -141,12 +141,23 @@ func richTimeSeriesForMatchedIdent(keyValue string, pt *prompb.TimeSeries) {
 	}
 
 	if matched {
-		for _, dt := range dtp.Tags {
-			label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
-			pt.Labels = append(pt.Labels, &label)
+		ifDescrPt := ""
+		for _, v := range pt.Labels {
+			if v.Name == string(IF_DESCR) {
+				ifDescrPt = v.Value
+				break
+			}
 		}
-		length := len(dtp.Tags)
-		pt.Samples[0].Value = pt.Samples[0].Value + float64(length)
+
+		if ifDescrPt == "" {
+			return
+		}
+		for _, dt := range dtp.Tags {
+			if strings.Contains(dt.TagName, ifDescrPt) {
+				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
+				pt.Labels = append(pt.Labels, &label)
+			}
+		}
 	}
 }
 
