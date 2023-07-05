@@ -84,7 +84,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 			continue
 		}
 		if dtp.IPV4 != "" {
-			dtp.IP = dtp.IPV4
+			dtp.IP = dtp.IPV4 + "/24"
 		}
 		if dtp.IPV6 != "" {
 			dtp.IP = dtp.IPV6
