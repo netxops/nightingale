@@ -153,7 +153,7 @@ func richTimeSeriesForMatchedIdent(keyValue string, pt *prompb.TimeSeries) {
 			return
 		}
 		for _, dt := range dtp.Tags {
-			if dt.Dimension != "toDevice" || (dt.Dimension == "toDevice" && strings.Contains(dt.TagName, ifDescrPt)) {
+			if dt.Dimension != "toDevice" || strings.Contains(dt.TagName, ifDescrPt) {
 				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
 				pt.Labels = append(pt.Labels, &label)
 			}
