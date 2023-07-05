@@ -105,7 +105,7 @@ func loopTagTask(pushgwRouter pushgwrt.Router) {
 			time.Sleep(duration)
 			richLabels := pushgwRouter.EnrichLabelsFromRedis()
 			pushgwrt.REDIS_TAGS = richLabels
-			logger.Info("源标签数据：", pushgwrt.REDIS_TAGS)
+			logger.Infof("源标签数据：%#v", pushgwrt.REDIS_TAGS)
 		}
 	}
 
