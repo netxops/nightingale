@@ -3,6 +3,7 @@ package center
 import (
 	"context"
 	"fmt"
+	"github.com/toolkits/pkg/logger"
 	"time"
 
 	"github.com/ccfos/nightingale/v6/alert"
@@ -104,6 +105,7 @@ func loopTagTask(pushgwRouter pushgwrt.Router) {
 			time.Sleep(duration)
 			richLabels := pushgwRouter.EnrichLabelsFromRedis()
 			pushgwrt.REDIS_TAGS = richLabels
+			logger.Info("源标签数据：", pushgwrt.REDIS_TAGS)
 		}
 	}
 
