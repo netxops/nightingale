@@ -23,11 +23,11 @@ func has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
 func RemakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 	if identVal, identExist := has(string(IDENT), pt); identExist {
 		peerRelationBuilder := PeerRelationLabelBuilder{}
-		peerRelationBuilder.Build(identVal+"/24", pt)
+		peerRelationBuilder.Build(identVal, pt)
 	}
 
 	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
 		targetBuilder := TargetLabelBuilder{}
-		targetBuilder.Build(targetVal+"/24", pt)
+		targetBuilder.Build(targetVal, pt)
 	}
 }
