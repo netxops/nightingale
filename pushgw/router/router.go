@@ -40,7 +40,7 @@ func New(httpConfig httpx.Config, pushgw pconf.Pushgw, tc *memsto.TargetCacheTyp
 	}
 
 	r.EnrichLabels = labeler.RemakeWriteRemoteEnrichLabels
-	REDIS_TAGS = r.EnrichLabelsFromRedis()
+	labeler.REDIS_TAGS = r.EnrichLabelsFromRedis()
 	return &r
 }
 
