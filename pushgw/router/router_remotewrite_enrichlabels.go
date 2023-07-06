@@ -46,7 +46,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]labeler.DeviceTagPair {
 		for _, tag := range dtp.Tags {
 			switch tag.Dimension {
 			case "设备":
-				tag.TagLabel = "device"
+				tag.TagLabel = "deviceType"
 			case "环境":
 				tag.TagLabel = "env"
 			case "区域":
