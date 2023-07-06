@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ccfos/nightingale/v6/pushgw/router/labeler"
 	"strings"
 
 	"github.com/prometheus/prometheus/prompb"
@@ -48,17 +47,17 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, dtp)
 }
 
-func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
-	if identVal, identExist := has(string(IDENT), pt); identExist {
-		peerRelationBuilder := labeler.PeerRelationLabelBuilder{}
-		peerRelationBuilder.Build(identVal+"/24", pt)
-	}
-
-	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
-		targetBuilder := labeler.TargetLabelBuilder{}
-		targetBuilder.Build(targetVal+"/24", pt)
-	}
-}
+//func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
+//	if identVal, identExist := Has(string(IDENT), pt); identExist {
+//		peerRelationBuilder := labeler.PeerRelationLabelBuilder{}
+//		peerRelationBuilder.Build(identVal+"/24", pt)
+//	}
+//
+//	if targetVal, targetExist := Has(string(TARGET), pt); targetExist {
+//		targetBuilder := labeler.TargetLabelBuilder{}
+//		targetBuilder.Build(targetVal+"/24", pt)
+//	}
+//}
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 	ct := rt.Ctx
@@ -122,7 +121,7 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 	return result
 }
 
-func has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
+func Has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
 	for _, v := range pt.Labels {
 		if strings.Contains(v.Name, key) {
 			return v.Value, true

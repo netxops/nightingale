@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/ccfos/nightingale/v6/pushgw/router/labeler"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/prometheus/prompb"
 
@@ -38,7 +39,7 @@ func New(httpConfig httpx.Config, pushgw pconf.Pushgw, tc *memsto.TargetCacheTyp
 		//EnrichLabels: func(pt *prompb.TimeSeries) {},
 	}
 
-	r.EnrichLabels = r.remakeWriteRemoteEnrichLabels
+	r.EnrichLabels = labeler.RemakeWriteRemoteEnrichLabels
 	REDIS_TAGS = r.EnrichLabelsFromRedis()
 	return &r
 }
