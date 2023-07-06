@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/ccfos/nightingale/v6/pushgw/router/labeler"
+	"github.com/ccfos/nightingale/v6/pushgw/labeler"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/prometheus/prompb"
 
