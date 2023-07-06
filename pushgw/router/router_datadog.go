@@ -180,15 +180,15 @@ func readDatadogBody(c *gin.Context) ([]byte, error) {
 	return bs, err
 }
 
-func (r *Router) datadogSeries(c *gin.Context) {
+func (rt *Router) datadogSeries(c *gin.Context) {
 	apiKey, has := c.GetQuery("api_key")
 	if !has {
 		apiKey = ""
 	}
 
-	if len(r.HTTP.APIForAgent.BasicAuth) > 0 {
+	if len(rt.HTTP.APIForAgent.BasicAuth) > 0 {
 		ok := false
-		for _, v := range r.HTTP.APIForAgent.BasicAuth {
+		for _, v := range rt.HTTP.APIForAgent.BasicAuth {
 			if apiKey == v {
 				ok = true
 				break
@@ -250,22 +250,22 @@ func (r *Router) datadogSeries(c *gin.Context) {
 			ids[ident] = struct{}{}
 
 			// fill tags
-			target, has := r.TargetCache.Get(ident)
+			target, has := rt.TargetCache.Get(ident)
 			if has {
-				r.AppendLabels(pt, target, r.BusiGroupCache)
+				rt.AppendLabels(pt, target, rt.BusiGroupCache)
 			}
 		}
 
-		r.debugSample(c.Request.RemoteAddr, pt)
+		rt.debugSample(c.Request.RemoteAddr, pt)
 
-		if r.Pushgw.WriterOpt.ShardingKey == "ident" {
+		if rt.Pushgw.WriterOpt.ShardingKey == "ident" {
 			if ident == "" {
-				r.Writers.PushSample("-", pt)
+				rt.Writers.PushSample("-", pt)
 			} else {
-				r.Writers.PushSample(ident, pt)
+				rt.Writers.PushSample(ident, pt)
 			}
 		} else {
-			r.Writers.PushSample(item.Metric, pt)
+			rt.Writers.PushSample(item.Metric, pt)
 		}
 
 		succ++
@@ -273,7 +273,7 @@ func (r *Router) datadogSeries(c *gin.Context) {
 
 	if succ > 0 {
 		CounterSampleTotal.WithLabelValues("datadog").Add(float64(succ))
-		r.IdentSet.MSet(ids)
+		rt.IdentSet.MSet(ids)
 	}
 
 	c.JSON(200, gin.H{

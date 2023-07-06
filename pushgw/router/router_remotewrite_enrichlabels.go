@@ -3,6 +3,7 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ccfos/nightingale/v6/pushgw/router/labeler"
 	"strings"
 
 	"github.com/prometheus/prometheus/prompb"
@@ -11,9 +12,12 @@ import (
 
 const DEVICE_TAG_REDIS_KEY = "DEVICE_TAG_REDIS_KEY"
 const (
-	IDENT    SpecifyLabel = "ident"
-	TARGET   SpecifyLabel = "target"
-	IF_DESCR SpecifyLabel = "ifDescr"
+	IDENT       SpecifyLabel = "ident"
+	TARGET      SpecifyLabel = "target"
+	IF_DESCR    SpecifyLabel = "ifDescr"
+	TO_DEVICE   SpecifyLabel = "toDevice"
+	PEER_DEVICE SpecifyLabel = "peerDevice"
+	PEER_PORT   SpecifyLabel = "peerPort"
 )
 
 var REDIS_TAGS map[string]DeviceTagPair
@@ -46,16 +50,14 @@ func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
 
 func (rt *Router) remakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
 	if identVal, identExist := has(string(IDENT), pt); identExist {
-		richTimeSeriesForMatchedIdent(identVal+"/24", pt)
+		peerRelationBuilder := labeler.PeerRelationLabelBuilder{}
+		peerRelationBuilder.Build(identVal+"/24", pt)
 	}
 
-	//if targetVal, targetExist := has(string(TARGET), pt); targetExist {
-	//	richTimeSeriesForMatchedTarget(targetVal, pt)
-	//}
-	//
-	//if ifDescrVal, ifDescrExist := has(string(IF_DESCR), pt); ifDescrExist {
-	//	richTimeSeriesForMatchedIfDescr(ifDescrVal, pt)
-	//}
+	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
+		targetBuilder := labeler.TargetLabelBuilder{}
+		targetBuilder.Build(targetVal+"/24", pt)
+	}
 }
 
 func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
@@ -126,66 +128,5 @@ func has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
 			return v.Value, true
 		}
 	}
-	return "", false
-}
-
-func richTimeSeriesForMatchedIdent(keyValue string, pt *prompb.TimeSeries) {
-	matched := false
-	dtp := DeviceTagPair{}
-	for _, v := range REDIS_TAGS {
-		if strings.Contains(keyValue, v.IP) {
-			matched = true
-			dtp = v
-			break
-		}
-	}
-
-	if matched {
-		ifDescrPt := ""
-		for _, v := range pt.Labels {
-			if v.Name == string(IF_DESCR) {
-				ifDescrPt = v.Value
-				break
-			}
-		}
-
-		if ifDescrPt == "" {
-			return
-		}
-		for _, dt := range dtp.Tags {
-			if dt.Dimension != "toDevice" || strings.Contains(dt.TagName, ifDescrPt) {
-				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
-				pt.Labels = append(pt.Labels, &label)
-			}
-		}
-	}
-}
-
-func richTimeSeriesForMatchedTarget(keyValue string, pt *prompb.TimeSeries) {
-	matched := false
-	dtp := DeviceTagPair{}
-	for _, v := range REDIS_TAGS {
-		if strings.Contains(keyValue, v.IP) {
-			matched = true
-			dtp = v
-			break
-		}
-	}
-
-	if matched {
-		label := prompb.Label{Name: "toDevice", Value: dtp.IP}
-		pt.Labels = append(pt.Labels, &label)
-	}
-}
-
-func richTimeSeriesForMatchedIfDescr(keyValue string, pt *prompb.TimeSeries) {
-	if keyValue == "100GE0/0/1" {
-		label := prompb.Label{Name: "xxx", Value: "value_xxx"}
-		pt.Labels = append(pt.Labels, &label)
-	}
-
-	if keyValue == "100GE0/0/2" {
-		label := prompb.Label{Name: "yyy", Value: "value_yyy"}
-		pt.Labels = append(pt.Labels, &label)
-	}
+	return
 }
