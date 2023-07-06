@@ -3,6 +3,7 @@ package center
 import (
 	"context"
 	"fmt"
+	"github.com/ccfos/nightingale/v6/pushgw/labeler"
 	"github.com/toolkits/pkg/logger"
 	"time"
 
@@ -104,8 +105,8 @@ func loopTagTask(pushgwRouter pushgwrt.Router) {
 			duration, _ := time.ParseDuration("30s")
 			time.Sleep(duration)
 			richLabels := pushgwRouter.EnrichLabelsFromRedis()
-			pushgwrt.REDIS_TAGS = richLabels
-			logger.Infof("源标签数据：%#v", pushgwrt.REDIS_TAGS)
+			labeler.REDIS_TAGS = richLabels
+			logger.Infof("源标签数据：%#v", labeler.REDIS_TAGS)
 		}
 	}
 
