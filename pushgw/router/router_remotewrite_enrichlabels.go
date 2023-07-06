@@ -3,51 +3,14 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ccfos/nightingale/v6/pushgw/labeler"
 	"github.com/toolkits/pkg/logger"
 )
 
-const DEVICE_TAG_REDIS_KEY = "DEVICE_TAG_REDIS_KEY"
-const (
-	IDENT       SpecifyLabel = "ident"
-	TARGET      SpecifyLabel = "target"
-	IF_DESCR    SpecifyLabel = "ifDescr"
-	TO_DEVICE   SpecifyLabel = "toDevice"
-	PEER_DEVICE SpecifyLabel = "peerDevice"
-	PEER_PORT   SpecifyLabel = "peerPort"
-)
-
-var REDIS_TAGS map[string]DeviceTagPair
-
-type SpecifyLabel string
-
-type DeviceTagPair struct {
-	ResourceKey string       `json:"resource_key"`
-	ResourceId  string       `json:"resource_id"`
-	DeviceName  string       `json:"device_name"`
-	IPV4        string       `json:"ipv4"`
-	IPV6        string       `json:"ipv6"`
-	IP          string       `json:"ip"`
-	Tags        []*DeviceTag `json:"tags"`
-}
-
-type DeviceTag struct {
-	Dimension string `json:"dimension"`
-	TagLabel  string `json:"tag_label"`
-	TagName   string `json:"tag_name"`
-}
-
-func (dtp DeviceTagPair) MarshalBinary() (data []byte, err error) {
-	return json.Marshal(dtp)
-}
-
-func (dtp *DeviceTagPair) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, dtp)
-}
-
-func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
+func (rt *Router) EnrichLabelsFromRedis() map[string]labeler.DeviceTagPair {
 	ct := rt.Ctx
 	rds := rt.TargetCache.GetRedis()
-	labelMap, err := rds.HGetAll(ct.GetContext(), DEVICE_TAG_REDIS_KEY).Result()
+	labelMap, err := rds.HGetAll(ct.GetContext(), labeler.DEVICE_TAG_REDIS_KEY).Result()
 	if err != nil {
 		logger.Errorf("get enrichLabels from redis has error: %v", err)
 		return nil
@@ -58,9 +21,9 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]DeviceTagPair {
 		return nil
 	}
 
-	result := map[string]DeviceTagPair{}
+	result := map[string]labeler.DeviceTagPair{}
 	for _, v := range labelMap {
-		dtp := DeviceTagPair{}
+		dtp := labeler.DeviceTagPair{}
 		if err = json.Unmarshal([]byte(v), &dtp); err != nil {
 			logger.Errorf("parse DeviceTagPair error: %v", err)
 			continue

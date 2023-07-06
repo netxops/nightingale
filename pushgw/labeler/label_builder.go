@@ -1,13 +1,12 @@
 package labeler
 
 import (
-	"github.com/ccfos/nightingale/v6/pushgw/router"
 	"github.com/prometheus/prometheus/prompb"
 	"strings"
 )
 
 type LabelBuilder interface {
-	MatchDeviceTagPair(keyValue string) (matched bool, dtp router.DeviceTagPair)
+	MatchDeviceTagPair(keyValue string) (matched bool, dtp DeviceTagPair)
 
 	Build(tagValue string, pt *prompb.TimeSeries)
 }
@@ -22,12 +21,12 @@ func has(key string, pt *prompb.TimeSeries) (keyValue string, matched bool) {
 }
 
 func RemakeWriteRemoteEnrichLabels(pt *prompb.TimeSeries) {
-	if identVal, identExist := has(string(router.IDENT), pt); identExist {
+	if identVal, identExist := has(string(IDENT), pt); identExist {
 		peerRelationBuilder := PeerRelationLabelBuilder{}
 		peerRelationBuilder.Build(identVal+"/24", pt)
 	}
 
-	if targetVal, targetExist := has(string(router.TARGET), pt); targetExist {
+	if targetVal, targetExist := has(string(TARGET), pt); targetExist {
 		targetBuilder := TargetLabelBuilder{}
 		targetBuilder.Build(targetVal+"/24", pt)
 	}

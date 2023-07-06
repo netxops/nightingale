@@ -1,15 +1,14 @@
 package labeler
 
 import (
-	"github.com/ccfos/nightingale/v6/pushgw/router"
 	"github.com/prometheus/prometheus/prompb"
 	"strings"
 )
 
 type TargetLabelBuilder struct{}
 
-func (t TargetLabelBuilder) MatchDeviceTagPair(ipAddress string) (matched bool, dtp router.DeviceTagPair) {
-	for _, v := range router.REDIS_TAGS {
+func (t TargetLabelBuilder) MatchDeviceTagPair(ipAddress string) (matched bool, dtp DeviceTagPair) {
+	for _, v := range REDIS_TAGS {
 		if strings.Contains(ipAddress, v.IP) {
 			matched = true
 			dtp = v
@@ -26,7 +25,7 @@ func (t TargetLabelBuilder) Build(ipAddress string, pt *prompb.TimeSeries) {
 	}
 	targetPt := ""
 	for _, v := range pt.Labels {
-		if v.Name == string(router.TARGET) {
+		if v.Name == string(TARGET) {
 			targetPt = v.Value
 			break
 		}
@@ -38,7 +37,7 @@ func (t TargetLabelBuilder) Build(ipAddress string, pt *prompb.TimeSeries) {
 
 	if targetPt == ipAddress {
 		for _, dt := range dtp.Tags {
-			if dt.Dimension != string(router.TO_DEVICE) && validdateDuplication(dt.TagLabel, pt) {
+			if dt.Dimension != string(TO_DEVICE) && validdateDuplication(dt.TagLabel, pt) {
 				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
 				pt.Labels = append(pt.Labels, &label)
 			}
