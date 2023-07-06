@@ -9,7 +9,7 @@ type PeerRelationLabelBuilder struct{}
 
 func (pe PeerRelationLabelBuilder) MatchDeviceTagPair(ipAddress string) (matched bool, dtp DeviceTagPair) {
 	for _, v := range REDIS_TAGS {
-		if strings.Contains(ipAddress, v.IP) {
+		if ipAddress == v.IP {
 			matched = true
 			dtp = v
 			return
