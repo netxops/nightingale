@@ -1,0 +1,28 @@
+
+[[instances]]
+  agent_host_tag = "ident"
+  agents = ["udp://10.26.64.254"]
+  community = "public123"
+  retries = 1
+  timeout = "5s"
+  version = 2
+
+  [[instances.field]]
+    name = "uptime"
+    oid = "RFC1213-MIB::sysUpTime.0"
+
+  [[instances.field]]
+    is_tag = true
+    name = "source"
+    oid = "RFC1213-MIB::sysName.0"
+
+  [[instances.table]]
+    inherit_tags = ["source"]
+    name = "interface"
+    oid = "IF-MIB::ifTable"
+
+    [[instances.table.field]]
+      is_tag = true
+      name = "ifDescr"
+      oid = "IF-MIB::ifDescr"
+

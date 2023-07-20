@@ -1,0 +1,39 @@
+[
+  {
+    "targetLabel": [
+      {
+        "matcher": [
+          {
+            "type": "metrics_name",
+            "match_name": "snmp_interface_ifInOctets"
+          },
+          {
+            "type": "metrics_value",
+            "match_name": "snmp_interface_ifInOctets",
+            "redis_field": "in_rate"
+          },
+          {
+            "type": "label_name",
+            "match_name": "machineRoom"
+          },
+          {
+            "type": "label_value",
+            "match_name": "machineRoom",
+            "redis_field": "site"
+          }
+        ],
+        "labeler": [
+          {
+            "type": "static",
+            "label_name": "A",
+            "lable_value": "B"
+          },
+          {
+            "type": "dynamic",
+            "label_name": "redis_field_site"
+          }
+        ]
+      }
+    ]
+  }
+]

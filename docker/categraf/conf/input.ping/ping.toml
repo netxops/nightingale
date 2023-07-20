@@ -1,0 +1,7 @@
+
+[[instances]]
+  targets = ["10.26.65.23"]
+
+  [instances.labels]
+    tag = "pingSelf"
+
