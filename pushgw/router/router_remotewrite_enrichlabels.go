@@ -59,6 +59,8 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]labeler.DeviceTagPair {
 				tag.TagLabel = "cloudPlatform"
 			case "toDevice":
 				tag.TagLabel = "toDevice"
+			case "租户":
+				tag.TagLabel = "tenant"
 			default:
 				break
 			}

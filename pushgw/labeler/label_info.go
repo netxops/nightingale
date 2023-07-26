@@ -10,6 +10,7 @@ const (
 	TO_DEVICE   SpecifyLabel = "toDevice"
 	PEER_DEVICE SpecifyLabel = "peerDevice"
 	PEER_PORT   SpecifyLabel = "peerPort"
+	TENANT      SpecifyLabel = "tenant"
 )
 
 var REDIS_TAGS map[string]DeviceTagPair
