@@ -36,8 +36,8 @@ func (t TargetLabelBuilder) Build(ipAddress string, pt *prompb.TimeSeries) {
 
 	if targetPt == ipAddress {
 		for _, dt := range dtp.Tags {
-			if dt.Dimension != string(TO_DEVICE) && validdateDuplication(dt.TagLabel, pt) {
-				label := prompb.Label{Name: dt.TagLabel, Value: dt.TagName}
+			if dt.TagName != string(TO_DEVICE) && validdateDuplication(dt.TagName, pt) {
+				label := prompb.Label{Name: dt.TagName, Value: dt.TagValue}
 				pt.Labels = append(pt.Labels, &label)
 			}
 		}

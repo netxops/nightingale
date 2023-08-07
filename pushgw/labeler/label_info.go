@@ -4,13 +4,14 @@ import "encoding/json"
 
 const DEVICE_TAG_REDIS_KEY = "DEVICE_TAG_REDIS_KEY"
 const (
-	IDENT       SpecifyLabel = "ident"
-	TARGET      SpecifyLabel = "target"
-	IF_DESCR    SpecifyLabel = "ifDescr"
-	TO_DEVICE   SpecifyLabel = "toDevice"
-	PEER_DEVICE SpecifyLabel = "peerDevice"
-	PEER_PORT   SpecifyLabel = "peerPort"
-	TENANT      SpecifyLabel = "tenant"
+	IDENT                SpecifyLabel = "ident"
+	TARGET               SpecifyLabel = "target"
+	IF_DESCR             SpecifyLabel = "ifDescr"
+	TO_DEVICE            SpecifyLabel = "toDevice"
+	PEER_DEVICE          SpecifyLabel = "peerDevice"
+	PEER_PORT            SpecifyLabel = "peerPort"
+	PEER_DEVICE_CATALOG  SpecifyLabel = "peerDeviceCatalog"
+	SPECIAL_NETWORK_LINE SpecifyLabel = "specialNetworkLine"
 )
 
 var REDIS_TAGS map[string]DeviceTagPair
@@ -29,8 +30,8 @@ type DeviceTagPair struct {
 
 type DeviceTag struct {
 	Dimension string `json:"dimension"`
-	TagLabel  string `json:"tag_label"`
 	TagName   string `json:"tag_name"`
+	TagValue  string `json:"tag_value"`
 }
 
 func (dtp DeviceTagPair) MarshalBinary() (data []byte, err error) {

@@ -43,28 +43,6 @@ func (rt *Router) EnrichLabelsFromRedis() map[string]labeler.DeviceTagPair {
 			continue
 		}
 
-		for _, tag := range dtp.Tags {
-			switch tag.Dimension {
-			case "设备":
-				tag.TagLabel = "deviceType"
-			case "环境":
-				tag.TagLabel = "env"
-			case "区域":
-				tag.TagLabel = "region"
-			case "机房":
-				tag.TagLabel = "machineRoom"
-			case "产品线":
-				tag.TagLabel = "productLine"
-			case "云平台":
-				tag.TagLabel = "cloudPlatform"
-			case "toDevice":
-				tag.TagLabel = "toDevice"
-			case "租户":
-				tag.TagLabel = "tenant"
-			default:
-				break
-			}
-		}
 		result[dtp.IP] = dtp
 	}
 
