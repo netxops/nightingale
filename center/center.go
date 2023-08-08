@@ -110,13 +110,13 @@ func loopTagTask(pushgwRouter pushgwrt.Router) {
 			logger.Infof("==================源标签数据=================")
 			for _, pair := range richLabels {
 				fmt.Println("-----------------------------------------------")
-				fmt.Println(fmt.Sprintf("name:%s, resource_key:%s, ip:%s, id:%s, tags:["), pair.DeviceName, pair.ResourceKey, pair.IP, pair.ResourceId)
+				fmt.Println(fmt.Sprintf("name:%s, resource_key:%s, ip:%s, id:%s, tags:[", pair.DeviceName, pair.ResourceKey, pair.IP, pair.ResourceId))
 				for _, tag := range pair.Tags {
 					fmt.Print(fmt.Sprintf("%s:%s", tag.TagName, tag.TagValue), "  ||  ")
 				}
 				fmt.Println("]")
 			}
-			logger.Infof("源标签数据：%#v", labeler.REDIS_TAGS)
+			//logger.Infof("源标签数据：%#v", labeler.REDIS_TAGS)
 		}
 	}
 
