@@ -112,7 +112,7 @@ func loopTagTask(pushgwRouter pushgwrt.Router) {
 				fmt.Println("-----------------------------------------------")
 				fmt.Println(fmt.Sprintf("name:%s, resource_key:%s, ip:%s, id:%s, tags:[", pair.DeviceName, pair.ResourceKey, pair.IP, pair.ResourceId))
 				for _, tag := range pair.Tags {
-					fmt.Print(fmt.Sprintf("%s:%s", tag.TagName, tag.TagValue), "  ||  ")
+					fmt.Print(fmt.Sprintf("%s:%s:%s", tag.Dimension, tag.TagName, tag.TagValue), "  ||  ")
 				}
 				fmt.Println("]")
 			}
