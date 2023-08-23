@@ -42,7 +42,6 @@ func (pe PeerRelationLabelBuilder) Build(ipAddress string, pt *prompb.TimeSeries
 				specialLineLabel := prompb.Label{Name: string(SPECIAL_NETWORK_LINE), Value: tagSplitArr[2]}
 				pt.Labels = append(pt.Labels, &specialLineLabel)
 			}
-			break
 		case string(TO_DEVICE):
 			if strings.Contains(dt.TagValue, "->") && tagSplitArr[0] == ifDescrPt {
 				peerPortLabel := prompb.Label{Name: string(PEER_PORT), Value: tagSplitArr[1]}
@@ -52,11 +51,9 @@ func (pe PeerRelationLabelBuilder) Build(ipAddress string, pt *prompb.TimeSeries
 				peerDeviceCatalogLabel := prompb.Label{Name: string(PEER_DEVICE_CATALOG), Value: tagSplitArr[3]}
 				pt.Labels = append(pt.Labels, &peerDeviceCatalogLabel)
 			}
-			break
 		default:
 			label := prompb.Label{Name: dt.TagName, Value: dt.TagValue}
 			pt.Labels = append(pt.Labels, &label)
-			break
 		}
 	}
 }
